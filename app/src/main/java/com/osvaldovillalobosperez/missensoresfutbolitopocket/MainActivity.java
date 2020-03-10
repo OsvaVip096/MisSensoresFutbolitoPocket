@@ -14,36 +14,53 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView equipoA, equipoB, marcadorA, marcadorB;
-    ImageView pelota;
+    /* Componentes utilizados en la interfaz: TextView y ImageView.*/
+    TextView equipoA, equipoB, marcadorA, marcadorB; // Es el texto plano de marcador de equipos.
+    ImageView pelota; // Imagen del balón que se movera con los sensores.
 
     SensorManager sensorManager;
     Sensor sensor;
     SensorEventListener sensorEventListener;
 
+    /* La altura y ancho son variables pertenecientes a la pantalla en que se muestra.
+    *  El puntaje A y B son de los equipos que anotan un gol, aumenta el del equipo que anoto. */
     int ancho = 0, alto = 0, puntajeA = 0, puntajeB = 0;
 
+    /* DisplayMetrics permite describir información general sobre una pantalla, como su tamaño,
+    *  densidad y escala de fuentes. */
     DisplayMetrics metrics;
 
+    /**
+     * Método onCreate que carga todos los componentes de la aplicación y se encargara de detectar
+     * los cambios que percibe en movimiento del dispositivo con los sensores de aceleración y
+     * modificará la posición de la imagén del balón.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /* Instanciamos los elementos pertenecientes al diseño como los TextView e ImageView
+        *  a través de su ID. */
         equipoA = findViewById(R.id.lblEquipoA);
         equipoB = findViewById(R.id.lblEquipoB);
         marcadorA = findViewById(R.id.lblMarcadorA);
         marcadorB = findViewById(R.id.lblMarcadorB);
         pelota = findViewById(R.id.imgPelota);
 
+        /* Obtenemos las medidas de la pantalla en que se está mostrando. */
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        ancho = metrics.widthPixels;
-        alto = metrics.heightPixels;
+        ancho = metrics.widthPixels; // De las medidas extraídas, asigmanos el ancho total.
+        alto = metrics.heightPixels; // De las mediad extraídas, asignamos el alto total.
 
+        /* Invocamos el sensor de aceleración por defecto. */
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        /* Si no existe el sensor de aceleración en el dispositivo móvil la aplicación se cerrará
+        *  automáticamente. */
         if (sensor == null) {
             Toast.makeText(
                     this,
@@ -54,11 +71,12 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
+        /* TODO: Escuchador del sensor de acelerometro que interpreta los cambios de movimiento. */
         sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
-                float x = event.values[0];
-                float y = event.values[1];
+                float x = event.values[0]; // Valores en el eje X de movimiento.
+                float y = event.values[1]; // Valores en el eje Y de movimiento.
 
                 if (x < (-1)) {
                     if (pelota.getX() < (ancho - pelota.getWidth())) {
@@ -99,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        /*TODO: registra el evento de movimiento, indica el sensor a usar y el delay del sensor. */
         sensorManager.registerListener(
                 sensorEventListener,
                 sensor,
@@ -106,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Cuando se realiza un Gol, el balón vuelve a la posición de inicio (al centro de la pantalla).
+     */
     private void Gol() {
         pelota.setX(540);
         pelota.setY(888);
@@ -116,12 +138,20 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
     }
 
+    /**
+     * Suspende el registro de movimiento del sensor de aceleración porque cambió el estado
+     * a onPause.
+     */
     @Override
     protected void onPause() {
         sensorManager.unregisterListener(sensorEventListener);
         super.onPause();
     }
 
+    /**
+     * Reanuda nuevamente el registro del sensor de aceleración, llama al metodo Gol para
+     * que inicie con la posición del balón en el centro de la pantalla.
+     */
     @Override
     protected void onResume() {
         sensorManager.registerListener(
