@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         sensorManager.registerListener(
                 sensorEventListener,
                 sensor,
-                sensorManager.SENSOR_DELAY_GAME
+                sensorManager.SENSOR_DELAY_FASTEST
         );
     }
 
