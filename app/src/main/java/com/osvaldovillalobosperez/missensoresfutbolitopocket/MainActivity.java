@@ -23,17 +23,18 @@ public class MainActivity extends AppCompatActivity {
     SensorEventListener sensorEventListener;
 
     /* La altura y ancho son variables pertenecientes a la pantalla en que se muestra.
-    *  El puntaje A y B son de los equipos que anotan un gol, aumenta el del equipo que anoto. */
+     * El puntaje A y B son de los equipos que anotan un gol, aumenta el del equipo que anoto. */
     int ancho = 0, alto = 0, puntajeA = 0, puntajeB = 0;
 
     /* DisplayMetrics permite describir información general sobre una pantalla, como su tamaño,
-    *  densidad y escala de fuentes. */
+     *  densidad y escala de fuentes. */
     DisplayMetrics metrics;
 
     /**
      * Método onCreate que carga todos los componentes de la aplicación y se encargara de detectar
      * los cambios que percibe en movimiento del dispositivo con los sensores de aceleración y
      * modificará la posición de la imagén del balón.
+     *
      * @param savedInstanceState
      */
     @Override
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         /* Instanciamos los elementos pertenecientes al diseño como los TextView e ImageView
-        *  a través de su ID. */
+         *  a través de su ID. */
         equipoA = findViewById(R.id.lblEquipoA);
         equipoB = findViewById(R.id.lblEquipoB);
         marcadorA = findViewById(R.id.lblMarcadorA);
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         /* Si no existe el sensor de aceleración en el dispositivo móvil la aplicación se cerrará
-        *  automáticamente. */
+         *  automáticamente. */
         if (sensor == null) {
             Toast.makeText(
                     this,
@@ -77,20 +78,21 @@ public class MainActivity extends AppCompatActivity {
             public void onSensorChanged(SensorEvent event) {
                 float x = event.values[0]; // Valores en el eje X de movimiento.
                 float y = event.values[1]; // Valores en el eje Y de movimiento.
+                float z = event.values[2]; // Valores en el eje Z de movimiento.
 
                 if (x < (-1)) {
                     if (pelota.getX() < (ancho - pelota.getWidth())) {
-                        pelota.setX(pelota.getX() + 30);
+                        pelota.setX(pelota.getX() + 5);
                     }
                 } else if (x > 1) {
                     if (pelota.getX() > 1) {
-                        pelota.setX(pelota.getX() - 30);
+                        pelota.setX(pelota.getX() - 5);
                     }
                 }
 
                 if (y < (-1)) {
                     if (pelota.getY() > 0) {
-                        pelota.setY(pelota.getY() - 50);
+                        pelota.setY(pelota.getY() - 5);
                     } else {
                         if ((pelota.getX() > 400) && (pelota.getX() < 580)) {
                             Gol();
@@ -100,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else if (y > 1) {
                     if (pelota.getY() < ((ancho - pelota.getHeight()) + 625)) {
-                        pelota.setY(pelota.getY() + 50);
+                        pelota.setY(pelota.getY() + 5);
                     } else {
                         if ((pelota.getX() > 400) && (pelota.getX() < 580)) {
                             Gol();
@@ -108,6 +110,14 @@ public class MainActivity extends AppCompatActivity {
                             marcadorA.setText(String.valueOf(puntajeA));
                         }
                     }
+                }
+
+                if (z < (-1)) {
+                    pelota.setMaxWidth(100);
+                    pelota.setMaxHeight(100);
+                } else if (z > 1) {
+                    pelota.setMaxWidth(100);
+                    pelota.setMaxHeight(100);
                 }
             }
 
@@ -121,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         sensorManager.registerListener(
                 sensorEventListener,
                 sensor,
-                sensorManager.SENSOR_DELAY_FASTEST
+                sensorManager.SENSOR_DELAY_GAME
         );
     }
 
